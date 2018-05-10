@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/paleta"
+        android:icon="@drawable/paleta"
+        android:title="Paleta de colores"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/grosor"
+        android:icon="@drawable/pincel"
+        android:title="Grosor"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/borrador"
+        android:icon="@drawable/borrador"
+        android:title="Borrador"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/grabar"
+        android:icon="@drawable/guardando"
+        android:title="Grabar"
+        app:showAsAction="always" />
+</menu>
