@@ -8,12 +8,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,6 +25,10 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.UUID;
 
 public class segundaActivity extends AppCompatActivity {
@@ -33,6 +39,8 @@ public class segundaActivity extends AppCompatActivity {
     String accion = "pintar";
     int tamañoPincel, colorPincel = Color.RED, tamañoBorrador = 20;
     Lienzo fondo;
+    boolean grabarDibujo = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,17 +120,17 @@ public class segundaActivity extends AppCompatActivity {
                 case MotionEvent.ACTION_DOWN:
                     path.moveTo(x,y);
                     break;
-                    case MotionEvent.ACTION_MOVE:
-                        path.lineTo(x,y);
-                        break;
-                        case MotionEvent.ACTION_UP:
-                            path.lineTo(x,y);
-                            dibujarCanvas.drawPath(path,pincel);
-                            path.reset();
-                            break;
-                            default:
-                                return false;
-            }
+                case MotionEvent.ACTION_MOVE:
+                    path.lineTo(x,y);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    path.lineTo(x,y);
+                    dibujarCanvas.drawPath(path,pincel);
+                    path.reset();
+                    break;
+                default:
+                    return false;
+        }
             invalidate();
             return true;
         }
@@ -183,11 +191,23 @@ public class segundaActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //do something :) to validate
                         fondo.setBackgroundColor(Color.WHITE);
-                        String nombre = String.valueOf(input.getText());
-                        Toast.makeText(getApplicationContext(), nombre, Toast.LENGTH_SHORT).show();
+                        String nombre = String.valueOf(input.getText());// + ".png";
+
+                        //valido después -Monse
+                        nombre = validar(nombre);
+
                         fondo.setDrawingCacheEnabled(true);
-                        String grabarDibujo = MediaStore.Images.Media.insertImage(getContentResolver(),fondo.getDrawingCache(), nombre+".png","dibujo");
-                        if(grabarDibujo != null)
+
+                        //NO MUEVAN APARENTEMENTE SIRVE -Monse
+                        try {
+                            grabarDibujo = fondo.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/PaintPro/", nombre +".png")));
+                        } catch (Exception e)
+                        {
+                            Log.e("Error--------->", e.toString());
+                        }
+                        //String grabarDibujo = MediaStore.Images.Media.insertImage(getContentResolver(), fondo.getDrawingCache(), nombre,"dibujo");
+
+                        if(grabarDibujo)
                             Toast.makeText(getApplicationContext(), "Dibujo grabado", Toast.LENGTH_SHORT).show();
                         else
                             Toast.makeText(getApplicationContext(), "No se ha podido grabar", Toast.LENGTH_SHORT).show();
@@ -205,6 +225,11 @@ public class segundaActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private String validar(String nombre)
+    {
+        return nombre;
     }
 
     private int borrarTamaño(int i) {

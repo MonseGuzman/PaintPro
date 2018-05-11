@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,12 +15,29 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity
+{
+    private ListView lvLista;
+    ArrayList archivosLista = new ArrayList();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        lvLista = (ListView)findViewById(R.id.lvLista);
+
+        CrearDirectorio("PaintPro");
+        cargarLista();
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,4 +70,46 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    //CARGA EL LISTVIEW
+    public void cargarLista()
+    {
+        File ruta = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); //regresa la ruta
+        File archivo = new File(ruta.getAbsolutePath() +"/PaintPro");
+        File[] nombres = archivo.listFiles();
+
+        if (nombres.length > 0)
+        {
+            for (int x=0; x< nombres.length; x++)
+            {
+                if(nombres[x].isFile())
+                {
+                    archivosLista.add(nombres[x].getName());
+                }
+            }
+
+            ArrayAdapter<String> adapter  = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, archivosLista);
+            lvLista.setAdapter(adapter);
+        }
+        else {
+            ArrayAdapter<String> adapter  = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, archivosLista);
+            lvLista.setAdapter(adapter);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        archivosLista.clear();
+        cargarLista();
+
+        super.onResume();
+    }
+
+    private void CrearDirectorio(String nombre)
+    {
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), nombre);
+        if(!file.exists())
+            file.mkdirs();//la primera vez crea el directorio
+    }
+
 }
