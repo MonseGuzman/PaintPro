@@ -15,8 +15,10 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.PhoneNumberUtils;
 import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -63,8 +65,7 @@ public class segundaActivity extends AppCompatActivity {
             for (int x=0;x<nombres.length;x++){
                 if (nombres[x].equals(bundle.getString("imagen"))) {
                     pathImagen = archivo.getAbsolutePath() + "/" + nombres[x];
-
-                    fondo.canvasBitmap = BitmapFactory.decodeFile(pathImagen);
+                    //fondo.canvasBitmap = BitmapFactory.decodeFile(pathImagen);
                 }
             }
         }
@@ -88,8 +89,8 @@ public class segundaActivity extends AppCompatActivity {
                 pintar();
             if(accion.equals("borrar"))
                 borrar();
-            /*if(accion.equals("modificar"))
-                canvasBitmap = BitmapFactory.decodeFile(pathImagen);*/
+            if(accion.equals("modificar"))
+                canvasBitmap = BitmapFactory.decodeFile(pathImagen);
         }
 
         public void pintar(){
@@ -124,11 +125,11 @@ public class segundaActivity extends AppCompatActivity {
                 pincel.setColor(Color.WHITE);
                 pincel.setStrokeWidth(tamañoBorrador);
             }
-            else if (accion.equals("modificar")) {
+            /*else if (accion.equals("modificar")) {
 
                 //canvasBitmap = BitmapFactory.decodeFile(pathImagen);
 
-            }
+            }*/
             canvas.drawBitmap(canvasBitmap,0,0,pintarCanvas);
             canvas.drawPath(path,pincel);
 
@@ -214,7 +215,7 @@ public class segundaActivity extends AppCompatActivity {
                 dialog.setTitle("GUARDAR DIBUJO");
                 dialog.setMessage("Ingrese un nombre para el dibujo a guardar");
                 final EditText input = new EditText(this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setInputType(InputType.TYPE_TEXT_VARIATION_FILTER);
                 dialog.setView(input);
                 dialog.setCancelable(false);
                 dialog.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
@@ -222,33 +223,43 @@ public class segundaActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //do something :) to validate
                         fondo.setBackgroundColor(Color.WHITE);
-                        String nombre = String.valueOf(input.getText());// + ".png";
+                        String nombre = String.valueOf(input.getText());
 
-                        //valido después -Monse
-                        nombre = validar(nombre);
-
-                        fondo.setDrawingCacheEnabled(true);
-
-                        //NO MUEVAN APARENTEMENTE SIRVE -Monse
-                        try {
-                            grabarDibujo = fondo.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/PaintPro/", nombre +".png")));
-                        } catch (Exception e)
+                        if(validar(nombre))
                         {
-                            Log.e("Error--------->", e.toString());
-                        }
-                        //String grabarDibujo = MediaStore.Images.Media.insertImage(getContentResolver(), fondo.getDrawingCache(), nombre,"dibujo");
+                            if(!existeArchivo(nombre))
+                            {
+                                fondo.setDrawingCacheEnabled(true);
 
-                        if(grabarDibujo)
-                            Toast.makeText(getApplicationContext(), "Dibujo grabado", Toast.LENGTH_SHORT).show();
-                        else
-                            Toast.makeText(getApplicationContext(), "No se ha podido grabar", Toast.LENGTH_SHORT).show();
-                        fondo.destroyDrawingCache();
+                                //NO MUEVAN APARENTEMENTE SIRVE -Monse
+                                try {
+                                    grabarDibujo = fondo.getDrawingCache().compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/PaintPro/", nombre + ".png")));
+                                } catch (Exception e) {
+                                    Log.e("Error--------->", e.toString());
+                                }
+                                //String grabarDibujo = MediaStore.Images.Media.insertImage(getContentResolver(), fondo.getDrawingCache(), nombre,"dibujo");
+
+                                if (grabarDibujo)
+                                    Toast.makeText(getApplicationContext(), "Dibujo grabado", Toast.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(getApplicationContext(), "No se ha podido grabar", Toast.LENGTH_SHORT).show();
+                                fondo.destroyDrawingCache();
+                                //cierra la activity
+                                finish();
+                            }
+                            else
+                                Toast.makeText(getApplicationContext(), "Ya existe este archivo", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            //seria pro que no se cerrará aquí
+                            Toast.makeText(getApplicationContext(), "Solo se aceptan números, minusculas y guiones", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
                 dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        dialog.setCancelable(true);
+                        dialogInterface.dismiss();
                     }
                 });
                 dialog.show();
@@ -258,9 +269,44 @@ public class segundaActivity extends AppCompatActivity {
         }
     }
 
-    private String validar(String nombre)
+    private boolean validar(String nombre)
     {
-        return nombre;
+        int c =1;
+        //minuscula
+        if(!Character.isUpperCase(nombre.charAt(0)))
+        {
+            while (c <= nombre.length()-1)
+            {
+                if(!Character.isUpperCase(nombre.charAt(c)) || nombre.charAt(c) == '_' || Character.isDigit(nombre.charAt(c)) )
+                    c++;
+                else
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean existeArchivo(String nombre)
+    {
+        File ruta = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); //regresa la ruta
+        File archivo = new File(ruta.getAbsolutePath() +"/PaintPro");
+        File[] numArchivos = archivo.listFiles();
+
+        if (numArchivos.length > 0)
+        {
+            for (int x=0; x< numArchivos.length; x++)
+            {
+                if(numArchivos[x].isFile())
+                {
+                    //falta que lo encuentré
+                    if(numArchivos[x].getName().equals(nombre))
+                        return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private int borrarTamaño(int i) {
