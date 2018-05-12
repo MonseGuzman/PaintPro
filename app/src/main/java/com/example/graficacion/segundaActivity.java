@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -40,6 +41,8 @@ public class segundaActivity extends AppCompatActivity {
     int tamañoPincel, colorPincel = Color.RED, tamañoBorrador = 20;
     Lienzo fondo;
     boolean grabarDibujo = false;
+    private Bundle bundle;
+    String pathImagen = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,26 +50,48 @@ public class segundaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_segunda);
         ConstraintLayout miLayout = (ConstraintLayout) findViewById(R.id.miLayout);
         fondo = new Lienzo(this);
-        miLayout.addView(fondo);
 
+
+        bundle = getIntent().getExtras();
+        if (bundle != null) {
+            accion = "modificar";
+            Toast.makeText(this, bundle.getString("imagen") + accion,Toast.LENGTH_LONG).show();
+            //trae el archivo
+            File ruta = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File archivo = new File(ruta.getAbsolutePath() +"/PaintPro");
+            String[] nombres = archivo.list();
+            for (int x=0;x<nombres.length;x++){
+                if (nombres[x].equals(bundle.getString("imagen"))) {
+                    pathImagen = archivo.getAbsolutePath() + "/" + nombres[x];
+
+                    fondo.canvasBitmap = BitmapFactory.decodeFile(pathImagen);
+                }
+            }
+        }
+        miLayout.addView(fondo);
     }
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu2,menu);
         return true;
     }
+
     class Lienzo extends View {
-        Path path = new Path();;
+        Path path = new Path();
         Paint pincel, pintarCanvas;
         Canvas dibujarCanvas;
         Bitmap canvasBitmap;
+
         public Lienzo(Context context) {
             super(context);
             if(accion.equals("pintar"))
                 pintar();
             if(accion.equals("borrar"))
                 borrar();
+            /*if(accion.equals("modificar"))
+                canvasBitmap = BitmapFactory.decodeFile(pathImagen);*/
         }
+
         public void pintar(){
             pincel = new Paint();
             pincel.setAntiAlias(true);
@@ -87,9 +112,9 @@ public class segundaActivity extends AppCompatActivity {
             pincel.setStrokeCap(Paint.Cap.ROUND);
             pintarCanvas = new Paint(Paint.DITHER_FLAG);
         }
+
         @Override
         protected void onDraw(Canvas canvas) {
-            canvas.drawBitmap(canvasBitmap,0,0,pintarCanvas);
             if(accion.equals("pintar")) {
                 pincel.setColor(colorPincel);
                 pincel.setStrokeWidth(tamañoPincel);
@@ -99,6 +124,12 @@ public class segundaActivity extends AppCompatActivity {
                 pincel.setColor(Color.WHITE);
                 pincel.setStrokeWidth(tamañoBorrador);
             }
+            else if (accion.equals("modificar")) {
+
+                //canvasBitmap = BitmapFactory.decodeFile(pathImagen);
+
+            }
+            canvas.drawBitmap(canvasBitmap,0,0,pintarCanvas);
             canvas.drawPath(path,pincel);
 
             super.onDraw(canvas);
@@ -130,7 +161,7 @@ public class segundaActivity extends AppCompatActivity {
                     break;
                 default:
                     return false;
-        }
+            }
             invalidate();
             return true;
         }

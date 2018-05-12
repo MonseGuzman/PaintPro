@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
 {
     private ListView lvLista;
+    private String imagen = "";
     ArrayList archivosLista = new ArrayList();
 
     @Override
@@ -37,6 +39,14 @@ public class MainActivity extends AppCompatActivity
 
         CrearDirectorio("PaintPro");
         cargarLista();
+
+        lvLista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                imagen = lvLista.getItemAtPosition(i) + ".png";
+                enviarImagenEditar(imagen);
+            }
+        });
 
     }
     @Override
@@ -84,7 +94,8 @@ public class MainActivity extends AppCompatActivity
             {
                 if(nombres[x].isFile())
                 {
-                    archivosLista.add(nombres[x].getName());
+                    String name = nombres[x].getName().replaceAll(".png", "");
+                    archivosLista.add(name);
                 }
             }
 
@@ -112,4 +123,9 @@ public class MainActivity extends AppCompatActivity
             file.mkdirs();//la primera vez crea el directorio
     }
 
+    public void enviarImagenEditar(String imagen){
+        Intent intent = new Intent(this,segundaActivity.class);
+        intent.putExtra("imagen", imagen);
+        startActivity(intent);
+    }
 }
