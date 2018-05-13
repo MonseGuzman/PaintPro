@@ -1,27 +1,25 @@
 package com.example.graficacion;
-import android.content.Context;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -29,6 +27,7 @@ public class MainActivity extends AppCompatActivity
     private ListView lvLista;
     private String imagen = "";
     ArrayList archivosLista = new ArrayList();
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +36,8 @@ public class MainActivity extends AppCompatActivity
 
         lvLista = (ListView)findViewById(R.id.lvLista);
 
-        CrearDirectorio("PaintPro");
-        cargarLista();
+        if(!checkPermission())
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
 
         lvLista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -110,8 +109,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
-        archivosLista.clear();
-        cargarLista();
+        if(checkPermission()) {
+            archivosLista.clear();
+            cargarLista();
+        }
 
         super.onResume();
     }
@@ -127,5 +128,35 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this,segundaActivity.class);
         intent.putExtra("imagen", imagen);
         startActivity(intent);
+    }
+
+    public boolean checkPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode)
+        {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
+
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //Aquí lo que se hace si aceptan el permiso
+                    CrearDirectorio("PaintPro");
+                    cargarLista();
+                }
+                else
+                    {
+                    //Aquí lo que se hace si no lo aceptan
+                }
+                break;
+        }
     }
 }
