@@ -137,7 +137,7 @@ public class segundaActivity extends AppCompatActivity {
             if (accion.equals("modificar")){
                 canvasBitmap = BitmapFactory.decodeFile(pathImagen);
                 canvas.drawBitmap(canvasBitmap,0,0,pintarCanvas);
-                dibujarCanvas = new Canvas(canvasBitmap);
+                //dibujarCanvas = new Canvas(canvasBitmap);
             }
             else if(accion.equals("pintar")) {
                 pincel.setColor(colorPincel);
@@ -168,10 +168,10 @@ public class segundaActivity extends AppCompatActivity {
                     path.lineTo(x,y);
                     break;
                 case MotionEvent.ACTION_UP:
-                    path.lineTo(x,y);
+                    /*path.lineTo(x,y);
                     dibujarCanvas.drawPath(path,pincel);
                     path.reset();
-                    break;//Si se quita aqui deja dibujar la imagen pero cuando cambias de tamaño o color se pierde
+                    break;*///Si se quita aqui deja dibujar la imagen pero cuando cambias de tamaño o color se pierde
                 default:
                     return false;
             }
