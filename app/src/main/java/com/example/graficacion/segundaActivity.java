@@ -11,12 +11,14 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.PhoneNumberUtils;
 import android.text.InputType;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -70,6 +72,7 @@ public class segundaActivity extends AppCompatActivity {
                 }
             }
         }
+
         miLayout.addView(fondo);
     }
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,8 +93,6 @@ public class segundaActivity extends AppCompatActivity {
                 pintar();
             if(accion.equals("borrar"))
                 borrar();
-            /*if(accion.equals("modificar"))
-                modificar();*/
         }
 
         public void pintar(){
@@ -114,9 +115,6 @@ public class segundaActivity extends AppCompatActivity {
             pincel.setStrokeCap(Paint.Cap.ROUND);
             pintarCanvas = new Paint(Paint.DITHER_FLAG);
         }
-        /*public void modificar(){
-            canvasBitmap = BitmapFactory.decodeFile(pathImagen);
-        }*/
 
         /*@Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -311,8 +309,7 @@ public class segundaActivity extends AppCompatActivity {
             {
                 if(numArchivos[x].isFile())
                 {
-                    //falta que lo encuentré
-                    if(numArchivos[x].getName().equals(nombre))
+                    if(numArchivos[x].getName().replaceAll(".png", "").equals(nombre))
                         return true;
                 }
             }
