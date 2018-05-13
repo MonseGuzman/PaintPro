@@ -44,7 +44,7 @@ public class segundaActivity extends AppCompatActivity {
     String accion = "pintar";
     int tamañoPincel, colorPincel = Color.RED, tamañoBorrador = 20;
     Lienzo fondo;
-    boolean grabarDibujo = false, tipoCanvas = false;
+    boolean grabarDibujo = false, esModificar = false;
     private Bundle bundle;
     String pathImagen = null;
 
@@ -58,7 +58,7 @@ public class segundaActivity extends AppCompatActivity {
 
         bundle = getIntent().getExtras();
         if (bundle != null) {
-            accion = "modificar";
+            esModificar = true;
             Toast.makeText(this, bundle.getString("imagen") + accion,Toast.LENGTH_LONG).show();
             //trae el archivo
             File ruta = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
@@ -67,12 +67,9 @@ public class segundaActivity extends AppCompatActivity {
             for (int x=0;x<nombres.length;x++){
                 if (nombres[x].equals(bundle.getString("imagen"))) {
                     pathImagen = archivo.getAbsolutePath() + "/" + nombres[x];
-                    tipoCanvas = true;
-                    //fondo.canvasBitmap = BitmapFactory.decodeFile(pathImagen);
                 }
             }
         }
-
         miLayout.addView(fondo);
     }
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -94,7 +91,6 @@ public class segundaActivity extends AppCompatActivity {
             if(accion.equals("borrar"))
                 borrar();
         }
-
         public void pintar(){
             pincel = new Paint();
             pincel.setAntiAlias(true);
@@ -115,29 +111,22 @@ public class segundaActivity extends AppCompatActivity {
             pincel.setStrokeCap(Paint.Cap.ROUND);
             pintarCanvas = new Paint(Paint.DITHER_FLAG);
         }
-
-        /*@Override
+        @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-            if (!tipoCanvas){
-                super.onSizeChanged(w, h, oldw, oldh);
+            super.onSizeChanged(w, h, oldw, oldh);
+            if (!esModificar){
                 canvasBitmap = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
                 dibujarCanvas = new Canvas(canvasBitmap);
             }else{
-                super.onSizeChanged(w, h, oldw, oldh);
-                canvasBitmap = Bitmap.createBitmap(BitmapFactory.decodeFile(pathImagen));
+                Bitmap workingBitmap = Bitmap.createBitmap(BitmapFactory.decodeFile(pathImagen));
+                canvasBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
                 dibujarCanvas = new Canvas(canvasBitmap);
-            }
-        }*/
-
-
+            }//Esto agregue para poder modificar la imagen, jeje saludos xD.
+        }
         @Override
         protected void onDraw(Canvas canvas) {
-            if (accion.equals("modificar")){
-                canvasBitmap = BitmapFactory.decodeFile(pathImagen);
-                canvas.drawBitmap(canvasBitmap,0,0,pintarCanvas);
-                //dibujarCanvas = new Canvas(canvasBitmap);
-            }
-            else if(accion.equals("pintar")) {
+            canvas.drawBitmap(canvasBitmap,0,0,pintarCanvas);
+            if(accion.equals("pintar")) {
                 pincel.setColor(colorPincel);
                 pincel.setStrokeWidth(tamañoPincel);
             }
@@ -149,10 +138,8 @@ public class segundaActivity extends AppCompatActivity {
             canvas.drawPath(path,pincel);
 
             super.onDraw(canvas);
+
         }
-
-
-
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             float x = event.getX();
@@ -166,10 +153,10 @@ public class segundaActivity extends AppCompatActivity {
                     path.lineTo(x,y);
                     break;
                 case MotionEvent.ACTION_UP:
-                    /*path.lineTo(x,y);
+                    path.lineTo(x,y);
                     dibujarCanvas.drawPath(path,pincel);
                     path.reset();
-                    break;*///Si se quita aqui deja dibujar la imagen pero cuando cambias de tamaño o color se pierde
+                    break;
                 default:
                     return false;
             }
@@ -187,7 +174,7 @@ public class segundaActivity extends AppCompatActivity {
                 dialogo.setItems(colores, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                       colorPincel = color(i);
+                        colorPincel = color(i);
                     }
                 });
                 dialogo.setCancelable(false);
@@ -309,7 +296,8 @@ public class segundaActivity extends AppCompatActivity {
             {
                 if(numArchivos[x].isFile())
                 {
-                    if(numArchivos[x].getName().replaceAll(".png", "").equals(nombre))
+                    //falta que lo encuentré
+                    if(numArchivos[x].getName().equals(nombre))
                         return true;
                 }
             }
