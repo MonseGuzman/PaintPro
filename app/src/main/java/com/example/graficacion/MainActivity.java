@@ -39,11 +39,11 @@ public class MainActivity extends AppCompatActivity
         if(!checkPermission())
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
         else
+
         {
             CrearDirectorio("PaintPro");
             cargarLista();
         }
-
         lvLista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

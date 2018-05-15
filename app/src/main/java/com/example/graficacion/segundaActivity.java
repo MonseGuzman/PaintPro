@@ -110,7 +110,7 @@ public class segundaActivity extends AppCompatActivity {
                 Bitmap workingBitmap = Bitmap.createBitmap(BitmapFactory.decodeFile(pathImagen));
                 canvasBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
                 dibujarCanvas = new Canvas(canvasBitmap);
-            }//Esto agregue para poder modificar la imagen, jeje saludos xD.
+            }
         }
         @Override
         protected void onDraw(Canvas canvas) {
@@ -160,6 +160,7 @@ public class segundaActivity extends AppCompatActivity {
             case R.id.paleta:
                 final AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
                 dialogo.setTitle("PALETA DE COLORES");
+                dialogo.setIcon(R.drawable.paleta);
                 dialogo.setItems(colores, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -173,6 +174,7 @@ public class segundaActivity extends AppCompatActivity {
             case R.id.grosor:
                 AlertDialog.Builder grosor = new AlertDialog.Builder(this);
                 grosor.setTitle("GROSOR DEL PINCEL");
+                grosor.setIcon(R.drawable.pincel);
                 grosor.setItems(pincel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -186,6 +188,7 @@ public class segundaActivity extends AppCompatActivity {
             case R.id.borrador:
                 AlertDialog.Builder borrar = new AlertDialog.Builder(this);
                 borrar.setTitle("TAMAÑO DEL BORRADOR");
+                borrar.setIcon(R.drawable.borrador);
                 borrar.setItems(borrador, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -229,7 +232,7 @@ public class segundaActivity extends AppCompatActivity {
                     }
 
                     if (grabarDibujo)
-                        mensaje = "Dibujo guadardo";
+                        mensaje = "Dibujo guardado";
                     else
                         mensaje = "No se ha podido grabar";
 
@@ -270,7 +273,7 @@ public class segundaActivity extends AppCompatActivity {
                         }
 
                         if (grabarDibujo)
-                            mensaje = "Dibujo guadardo";
+                            mensaje = "Dibujo guardado";
                         else
                             mensaje = "No se ha podido grabar";
 
