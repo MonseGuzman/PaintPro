@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
         lvLista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                imagen = lvLista.getItemAtPosition(i) + ".png";
+                imagen = lvLista.getItemAtPosition(i).toString();
                 enviarImagenEditar(imagen);
             }
         });
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if(nombres[x].isFile())
                 {
-                    String name = nombres[x].getName().replaceAll(".png", "");
+                    String name = nombres[x].getName();
                     archivosLista.add(name);
                 }
             }

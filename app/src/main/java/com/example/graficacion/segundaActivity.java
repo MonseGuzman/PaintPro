@@ -287,7 +287,7 @@ public class segundaActivity extends AppCompatActivity {
                 }
                 else {
                     //seria pro que no se cerrará aquí
-                    Toast.makeText(getApplicationContext(), "Solo se aceptan números, minusculas y guiones", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Entrada no válida", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -304,16 +304,21 @@ public class segundaActivity extends AppCompatActivity {
     {
         int c =1;
         //minuscula
-        if(!Character.isUpperCase(nombre.charAt(0)))
+        if(!Character.isUpperCase(nombre.charAt(0)) && !Character.isDigit(nombre.charAt(0))) //quizás -Monse
         {
-            while (c <= nombre.length()-1)
+            if (Character.isDigit(nombre.charAt(0)))
+                return false;
+            else
             {
-                if(!Character.isUpperCase(nombre.charAt(c)) || nombre.charAt(c) == '_' || Character.isDigit(nombre.charAt(c)) )
-                    c++;
-                else
-                    return false;
+                while (c <= nombre.length()-1)
+                {
+                    if(!Character.isUpperCase(nombre.charAt(c)) || nombre.charAt(c) == '_' || Character.isDigit(nombre.charAt(c)) )
+                        c++;
+                    else
+                        return false;
+                }
+                return true;
             }
-            return true;
         }
         return false;
     }
